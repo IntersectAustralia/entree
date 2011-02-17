@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+    default-autowire="byName">
+
+    <bean id="ftpFileSender" class="au.org.intersect.entreecore.ftp.FtpTransferService">
+        <constructor-arg ref="transferService" />
+        <constructor-arg name="destination" value="${sftp.remote.path}" />
+    </bean>
+
+    <bean id="passwordAuthentication" class="au.org.intersect.filetransfer.sftp.PasswordAuthenticationMethod">
+        <property name="username" value="${sftp.username}" />
+        <property name="password" value="${sftp.password}" />
+    </bean>
+
+    <bean id="transferService" class="au.org.intersect.filetransfer.sftp.SftpFileTransferService">
+        <property name="authenticationMethod" ref="passwordAuthentication" />
+        <property name="host" value="${sftp.host}" />
+        <property name="tempPostfix" value=".tmp" />
+        <property name="hostsKeyVerification" ref="alwaysAllowHostKeyVerification" />
+    </bean>
+
+    <bean id="alwaysAllowHostKeyVerification" class="au.org.intersect.filetransfer.sftp.AlwaysAllowHostKeyVerification" />
+
+</beans>

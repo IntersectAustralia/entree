@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+    default-autowire="byName">
+
+    <bean id="baseMapper" class="au.org.intersect.entreecore.rowmapper.ConfigurableRowMapper">
+        <!-- 
+           This is a special row mapper that applies conversions before putting the data in the CSV.
+           Columns NOT explicitly configured below will just be transferred directly to the CSV unchanged.
+           Those configured below will be run through the converter before being put in the CSV. 
+        -->
+           
+        <constructor-arg name="backingMapper" ref="rowMapper" />
+        <!-- sets up converters that operate on a single column -->
+        <constructor-arg name="converters">
+            <map>
+                <entry key="alt" value-ref="altitudeConverter" />
+                <entry key="consta" value-ref="conservationStatusConverter" />
+                <entry key="soil" value-ref="soilTypeConverter" />
+                <entry key="sp" value-ref="lowerCaseConverter" />
+                <entry key="fam" value-ref="sentenceCaseConverter" />
+                <entry key="gen" value-ref="sentenceCaseConverter" />
+                <entry key="sru" value-ref="regionConverter" />
+                <entry key="isp" value-ref="infraspecificRankConverter" />
+                <entry key="cdat" value-ref="timestampFormatterConverter" />
+                <entry key="veg" value-ref="vegetationConverter" />
+                <entry key="Height" value-ref="heightConverter" />
+                <entry key="altdet" value-ref="gpsConverter" />
+            </map>
+        </constructor-arg>
+        <!-- sets up converters that operate on multiple columns -->
+        <constructor-arg name="multiValueConverters">
+            <list>
+                <ref bean="notesConverter" />
+                <ref bean="uowLocationConverter" />
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <!-- Converters -->
+    <bean id="notesConverter" class="au.org.intersect.entreecore.mapping.CombineFieldValuesConverter">
+        <constructor-arg name="finalKey" value="cnot" />
+        <constructor-arg name="keysToCombine">
+            <list>
+                <value>cnot</value>
+                <value>Height</value>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="gpsConverter" class="au.org.intersect.entreecore.mapping.GpsConverter" />
+
+    <bean id="uowLocationConverter" class="au.org.intersect.entreecore.mapping.UoWLocationConverter">
+        <constructor-arg name="locationConverter" ref="locationConverter"/>
+        <constructor-arg name="locationFuzzingRules" ref="locationFuzzingRules"/>
+    </bean>
+
+    <bean id="locationFuzzingRules" class="au.org.intersect.entreecore.mapping.geo.LocationFuzzingRules">
+        <constructor-arg name="shouldFuzzSecretLocations" value="true"/>
+        <constructor-arg name="columnToCheck" value="consta"/>
+        <constructor-arg name="regexToMatch" value="^.+$"/> <!--  not empty -->
+    </bean>
+
+    <bean id="altitudeConverter" class="au.org.intersect.entreecore.mapping.AltitudeConverter" />
+
+    <bean id="sentenceCaseConverter" class="au.org.intersect.entreecore.mapping.SentenceCaseConverter" />
+
+    <bean id="lowerCaseConverter" class="au.org.intersect.entreecore.mapping.LowerCaseConverter" />
+
+    <bean id="infraspecificRankConverter" class="au.org.intersect.entreecore.mapping.InfraspecificRankConverter" />
+
+    <bean id="timestampFormatterConverter" class="au.org.intersect.entreecore.mapping.TimestampFormatterConverter" />
+
+    <bean id="regionConverter" class="au.org.intersect.entreecore.mapping.CodeLookupConverter">
+        <constructor-arg name="codesDao">
+            <bean class="au.org.intersect.entreecore.mapping.MapLookupCodesDao">
+                <constructor-arg name="inputCodes">
+                    <map>
+                      <entry key="NC" value="North Coast"/>
+                      <entry key="CC" value="Central Coast"/>
+                      <entry key="SC" value="South Coast"/>
+                      <entry key="NT" value="Northern Tablelands"/>
+                      <entry key="CT" value="Central Tablelands"/>
+                      <entry key="ST" value="Southern Tablelands"/>
+                      <entry key="NWS" value="North Western Slopes"/>
+                      <entry key="CWS" value="Central Western Slopes"/>
+                      <entry key="SWS" value="South Western Slopes"/>
+                      <entry key="NWP" value="North Western Plains"/>
+                      <entry key="SWP" value="South Western Plains"/>
+                      <entry key="NFWP" value="North Far Western Plains"/>
+                      <entry key="SFWP" value="South Far Western Plains"/>
+                      <entry key="LHI" value="Lord Howe Island"/>
+                    </map>
+                </constructor-arg>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="description" value="Region" />
+    </bean>
+
+    <bean id="heightConverter" class="au.org.intersect.entreecore.mapping.PrefixingConverter">
+        <constructor-arg name="prefix" value="Height: " />
+    </bean>
+
+    <bean id="conservationStatusConverter" class="au.org.intersect.entreecore.mapping.MultipleDelimitedCodesLookupConverter">
+        <constructor-arg name="codesDao">
+            <bean class="au.org.intersect.entreecore.mapping.JdbcCodesDao">
+                <constructor-arg name="jdbcTemplate" ref="jdbcTemplate" />
+                <constructor-arg name="databaseQuery"
+                    value="SELECT ConsCode, Conservation FROM &quot;tblConservation status&quot;" />
+                <constructor-arg name="keyColumnName" value="ConsCode" />
+                <constructor-arg name="valueColumnName" value="Conservation" />
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="description" value="Conservation Status" />
+    </bean>
+
+    <bean id="soilTypeConverter" class="au.org.intersect.entreecore.mapping.MultipleDelimitedCodesLookupConverter">
+        <constructor-arg name="codesDao">
+            <bean class="au.org.intersect.entreecore.mapping.JdbcCodesDao">
+                <constructor-arg name="jdbcTemplate" ref="jdbcTemplate" />
+                <constructor-arg name="databaseQuery" value="SELECT Code, SoilType FROM SoilType" />
+                <constructor-arg name="keyColumnName" value="Code" />
+                <constructor-arg name="valueColumnName" value="SoilType" />
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="description" value="Soil Type" />
+    </bean>
+
+    <bean id="vegetationConverter" class="au.org.intersect.entreecore.mapping.CodeLookupConverter">
+        <constructor-arg name="codesDao">
+            <bean class="au.org.intersect.entreecore.mapping.JdbcCodesDao">
+                <constructor-arg name="jdbcTemplate" ref="jdbcTemplate" />
+                <constructor-arg name="databaseQuery" value="SELECT HabitCode, Habit FROM tblHabit" />
+                <constructor-arg name="keyColumnName" value="HabitCode" />
+                <constructor-arg name="valueColumnName" value="Habit" />
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="description" value="Vegetation" />
+    </bean>
+    
+    <!-- Helpers -->
+    <bean id="geoAccuracyCalculator" class="au.org.intersect.entreecore.mapping.geo.GeoAccuracyCalculator" />
+
+    <bean id="redfearnsFormulaWrapper" class="au.org.intersect.entreecore.mapping.geo.RedfearnsFormulaWrapper" />
+
+    <bean id="molodensky" class="au.org.intersect.entreecore.mapping.geo.Molodensky" />
+
+    <bean id="locationFuzzer" class="au.org.intersect.entreecore.mapping.geo.LocationFuzzer" />
+
+    <bean id="gridToLatitudeLongitudeConverter" class="au.org.intersect.entreecore.mapping.geo.GridToLatitudeLongitudeConverter" >
+        <constructor-arg name="redfearnsFormulaWrapper" ref="redfearnsFormulaWrapper"/>
+        <constructor-arg name="molodensky" ref="molodensky"/>
+    </bean>
+
+    <bean id="locationConverter" class="au.org.intersect.entreecore.mapping.geo.LocationConverter">
+        <constructor-arg name="geoAccuracyCalculator" ref="geoAccuracyCalculator"/>
+        <constructor-arg name="gridToLatitudeLongitudeConverter" ref="gridToLatitudeLongitudeConverter"/>
+        <constructor-arg name="locationFuzzer" ref="locationFuzzer"/>
+    </bean>
+
+    
+
+</beans>

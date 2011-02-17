@@ -1,0 +1,1 @@
+The "template" directory contains the default mapper definition ("mapper-context.xml") and a sample properties file. To use the system you will need to populate the properties file with settings relevant to your database and institution. In the simplest case the mapper can be left as-is. Refer to the documentation for more details.
