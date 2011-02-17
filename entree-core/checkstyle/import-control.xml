@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!DOCTYPE import-control PUBLIC
+    "-//Puppy Crawl//DTD Import Control 1.0//EN"
+    "http://www.puppycrawl.com/dtds/import_control_1_0.dtd">
+
+<import-control pkg="au.org.intersect.entreecore">
+
+    <allow pkg="java.util" />
+    <allow pkg="java.io" />
+    <allow pkg="java.text" />
+    <allow pkg="org.apache.log4j" />
+    
+    <subpackage name="controller">
+        <allow pkg="org.springframework.context"/>
+        <allow pkg="au.org.intersect.entreecore.datasource" local-only="true" />
+        <allow pkg="au.org.intersect.entreecore.csv" local-only="true" />
+        <allow pkg="au.org.intersect.entreecore.hispid" local-only="true" />
+    </subpackage>
+    
+    <subpackage name="csv">
+        <allow pkg="org.apache.commons.io"/>
+    </subpackage>
+    
+    <subpackage name="rowmapper">
+        <allow pkg="java.sql" local-only="true" />
+        <allow pkg="org.springframework.jdbc"/>
+        <allow pkg="au.org.intersect.entreecore.csv" local-only="true" />
+        <allow pkg="au.org.intersect.entreecore.mapping" local-only="true" />
+        <allow pkg="au.org.intersect.entreecore.datasource.db" local-only="true"/>
+        <allow pkg="au.org.intersect.entreecore.worker" local-only="true"/>
+    </subpackage>
+    
+    <subpackage name="mapping">
+        <allow pkg="java.sql" local-only="true" />
+        <allow pkg="org.springframework.jdbc"/>
+        <allow pkg="au.org.intersect.entreecore.mapping.geo" local-only="true"/>
+    </subpackage>
+    
+    <subpackage name="datasource">
+        <subpackage name="db">
+            <allow pkg="javax.sql"/>
+            <allow pkg="org.springframework.jdbc"/>
+            <allow pkg="au.org.intersect.entreecore.datasource"/>
+            <allow pkg="au.org.intersect.entreecore.worker" local-only="true"/>
+        </subpackage>
+    </subpackage>
+    
+    <subpackage name="ftp">
+        <allow pkg="au.org.intersect.entreecore.worker"/>
+        <allow pkg="au.org.intersect.entreecore.filesender"/>
+        <allow pkg="au.org.intersect.filetransfer" local-only="true"/>
+    </subpackage>
+
+    <subpackage name="filesender">
+        <allow pkg="au.org.intersect.entreecore.worker"/>
+    </subpackage>
+
+    <subpackage name="httpfilesender">
+        <allow pkg="au.org.intersect.entreecore.worker"/>
+        <allow pkg="au.org.intersect.entreecore.filesender"/>
+        <allow pkg="org.apache.http"/>
+    </subpackage>
+
+</import-control>
+

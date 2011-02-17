@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="src" path="resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/test/junit-4.8.1.jar"/>
+	<classpathentry kind="lib" path="lib/app/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="lib/test/mockito-all-1.8.4.jar"/>
+	<classpathentry kind="lib" path="lib/app/org.springframework.core-3.0.3.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/app/org.springframework.jdbc-3.0.3.RELEASE.jar" sourcepath="lib/source/org.springframework.jdbc-sources-3.0.3.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/app/org.springframework.context-3.0.3.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/app/org.springframework.beans-3.0.3.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/app/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/app/org.springframework.asm-3.0.3.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/app/org.springframework.expression-3.0.3.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/app/org.springframework.transaction-3.0.0.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/app/commons-dbcp-1.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/app/commons-pool-1.5.4.jar"/>
+	<classpathentry kind="lib" path="lib/app/ojdbc6.jar"/>
+	<classpathentry kind="lib" path="lib/app/commons-io-1.4.jar" sourcepath="lib/source/commons-io-1.4-sources.jar"/>
+	<classpathentry kind="lib" path="lib/test/hsqldb.jar"/>
+	<classpathentry kind="lib" path="lib/app/file-transfer-1.0.2-jar-with-dependencies.jar"/>
+	<classpathentry kind="lib" path="lib/app/httpclient-4.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/app/httpmime-4.0.1.jar" sourcepath="lib/source/httpcomponents-client-4.0.1-src.zip"/>
+	<classpathentry kind="lib" path="lib/app/apache-mime4j-0.6.jar"/>
+	<classpathentry kind="lib" path="lib/app/commons-codec-1.3.jar"/>
+	<classpathentry kind="lib" path="lib/app/httpcore-4.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/app/postgresql-8.4-701.jdbc3.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
