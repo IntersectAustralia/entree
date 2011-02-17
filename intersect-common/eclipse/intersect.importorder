@@ -1,0 +1,8 @@
+#Organize Import Order
+#Thu May 06 12:02:13 EST 2010
+5=au.org.intersect
+4=junit
+3=com
+2=org
+1=javax
+0=java
