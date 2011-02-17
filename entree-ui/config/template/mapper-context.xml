@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+    default-autowire="byName">
+
+    <!-- 
+         This is the default, where the data is taken from the query results and put directly into the CSV with no translation. 
+         More customised behaviour can be achieved by implementing converter classes. See the mapper under UoW for an example.
+    -->
+    <bean id="baseMapper" class="au.org.intersect.entreecore.rowmapper.BasicRowMapper">
+        <constructor-arg ref="rowMapper" />
+    </bean>
+
+</beans>

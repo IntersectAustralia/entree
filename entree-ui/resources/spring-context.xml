@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd 
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd 
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd"
+    default-autowire="byName">
+
+    <!-- Property Configurer -->
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:entree-config.properties" />
+    </bean>
+
+    <bean id="controller" class="au.org.intersect.entreeui.controller.Controller">
+        <constructor-arg ref="csvWritingRowHandler" />
+        <constructor-arg ref="entreeApplication" />
+    </bean>
+
+    <bean id="querier" class="au.org.intersect.entreecore.datasource.db.QuerierImpl">
+        <constructor-arg ref="jdbcTemplate" />
+        <constructor-arg name="sql" value="${sql.query}" />
+        <constructor-arg name="countingSql" value="${sql.countingQuery}" />
+    </bean>
+
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${sql.driverName}" />
+        <property name="url" value="${sql.jdbc.url}" />
+        <property name="username" value="${sql.jdbc.username}" />
+        <property name="password" value="${sql.jdbc.password}" />
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <constructor-arg ref="dataSource" />
+    </bean>
+
+    <bean id="csvWriter" class="au.org.intersect.entreecore.csv.CsvWriter" />
+
+    <bean id="csvGenerator" class="au.org.intersect.entreecore.csv.CsvGenerator">
+        <constructor-arg name="csvHeaders" value="${csv.headers}" />
+    </bean>
+
+    <bean id="rowMapper" class="org.springframework.jdbc.core.ColumnMapRowMapper" />
+
+    <!-- import mapper context: these may be customised per-institution -->
+    <import resource="mapper-context.xml"/>
+
+    <bean id="csvWritingRowHandler" class="au.org.intersect.entreecore.rowmapper.CsvWritingRowHandler">
+        <constructor-arg ref="csvWriter" />
+        <constructor-arg ref="csvGenerator" />
+        <constructor-arg ref="baseMapper" />
+        <constructor-arg name="institutionId" value="${hispid.insid}" />
+    </bean>
+
+    <bean id="entreeApplication" class="au.org.intersect.entreeui.ui.EntreeApplication">
+        <constructor-arg ref="uiWorker" />
+        <constructor-arg ref="extractOnlyWorker" />
+        <constructor-arg ref="failureScreenFactory" />
+    </bean>
+
+    <bean id="failureScreenFactory" class="au.org.intersect.entreeui.ui.wizard.FailureScreenFactoryImpl" />
+
+    <import resource="ftp-transport-context.xml" />
+    <import resource="http-transport-context.xml" />
+
+    <bean id="uiWorker" class="au.org.intersect.entreeui.worker.UiWorker">
+        <constructor-arg ref="querier" />
+        <constructor-arg ref="csvWritingRowHandler" />
+        <!--
+            Set the transport based on a property from the properties file. Note that the property must match the prefix
+            of one of the beans defined above (currently http and ftp are supported)
+        -->
+        <constructor-arg ref="${transport.type}FileSender" />
+        <constructor-arg ref="csvWriter" />
+        <constructor-arg ref="fileSystemUtil" />
+        <constructor-arg ref="csvGenerator" />
+        <constructor-arg value="${csv.file.path}" />
+    </bean>
+    
+    <bean id="extractOnlyWorker" class="au.org.intersect.entreeui.worker.ExtractOnlyWorker">
+        <constructor-arg ref="querier" />
+        <constructor-arg ref="csvWritingRowHandler" />
+        <constructor-arg ref="csvWriter" />
+        <constructor-arg ref="fileSystemUtil" />
+        <constructor-arg ref="csvGenerator" />
+        <constructor-arg value="${csv.file.path}" />    
+    </bean>
+
+    <bean id="fileSystemUtil" class="au.org.intersect.entreeui.util.FilesystemUtil" />
+
+</beans>

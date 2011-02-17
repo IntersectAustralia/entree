@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+
+<project name="entree-ui-classpath" basedir="." >
+    <target name="-augment-classpath" depends="-doWin32, -doWin64, -doMacCocoa64, -doMacCocoa32, -doMacCarbon32, -doLinux32, -doLinux64"/>
+
+    <target name="-doWin32" if="isWin32">
+        <echo message="Building for Windows (32 bit)" />
+        <path id="base.classpath">
+            <fileset dir="${app.lib.dir}">
+                <include name="*.jar" />
+            </fileset>
+            <fileset dir="${app.lib.dir}/win">
+                <include name="*.jar"/>
+            </fileset>
+            <pathelement location="${instrumented.classes.dir}" />
+            <pathelement location="${src.compile.dir}" />
+        </path>
+    </target>
+
+    <target name="-doWin64" if="isWin64">
+        <echo message="Building for Windows (64 bit)" />
+        <path id="base.classpath">
+            <fileset dir="${app.lib.dir}">
+                <include name="*.jar" />
+            </fileset>
+            <fileset dir="${app.lib.dir}/win-64">
+                <include name="*.jar"/>
+            </fileset>
+            <pathelement location="${instrumented.classes.dir}" />
+            <pathelement location="${src.compile.dir}" />
+        </path>
+    </target>
+
+    <target name="-doMacCocoa64" if="isMacCocoa64">
+        <echo message="Building for Mac (64 bit, cocoa)" />
+        <path id="base.classpath">
+            <fileset dir="${app.lib.dir}">
+                <include name="*.jar" />
+            </fileset>
+            <fileset dir="${app.lib.dir}/mac-cocoa-64">
+                <include name="*.jar"/>
+            </fileset>
+            <pathelement location="${instrumented.classes.dir}" />
+            <pathelement location="${src.compile.dir}" />
+        </path>
+    </target>
+
+    <target name="-doMacCocoa32" if="isMacCocoa32">
+        <echo message="Building for Mac (32 bit, cocoa)" />
+        <path id="base.classpath">
+            <fileset dir="${app.lib.dir}">
+                <include name="*.jar" />
+            </fileset>
+            <fileset dir="${app.lib.dir}/mac-cocoa-32">
+                <include name="*.jar"/>
+            </fileset>
+            <pathelement location="${instrumented.classes.dir}" />
+            <pathelement location="${src.compile.dir}" />
+        </path>
+    </target>
+
+    <target name="-doMacCarbon32" if="isMacCarbon32">
+        <echo message="Building for Mac (32 bit, carbon)" />
+        <path id="base.classpath">
+            <fileset dir="${app.lib.dir}">
+                <include name="*.jar" />
+            </fileset>
+            <fileset dir="${app.lib.dir}/mac-carbon-32">
+                <include name="*.jar"/>
+            </fileset>
+            <pathelement location="${instrumented.classes.dir}" />
+            <pathelement location="${src.compile.dir}" />
+        </path>
+    </target>
+
+    <target name="-doLinux32" if="isLinux32">
+        <echo message="Building for Linux (32 bit)"/>
+        <path id="base.classpath">
+            <fileset dir="${app.lib.dir}">
+                <include name="*.jar" />
+            </fileset>
+            <fileset dir="${app.lib.dir}/linux">
+                <include name="*.jar"/>
+            </fileset>
+            <pathelement location="${instrumented.classes.dir}" />
+            <pathelement location="${src.compile.dir}" />
+        </path>
+    </target>
+
+	<target name="-doLinux64" if="isLinux64">
+        <echo message="Building for Linux (64 bit)"/>
+        <path id="base.classpath">
+            <fileset dir="${app.lib.dir}">
+                <include name="*.jar" />
+            </fileset>
+            <fileset dir="${app.lib.dir}/linux-64">
+                <include name="*.jar"/>
+            </fileset>
+            <pathelement location="${instrumented.classes.dir}" />
+            <pathelement location="${src.compile.dir}" />
+        </path>
+    </target>
+</project>

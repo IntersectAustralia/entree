@@ -1,0 +1,9 @@
+This file is a list of dependencies for entree-ui.
+
+The mac/win subfolders are for platform-specific jars.
+
+log4j-1.2.16.jar is the logging library we are using.
+
+org.eclipse.core, org.eclipse.equinox, org.eclipse.jface, org.eclipse.swt are required for swt/jfaces
+
+postgresql-8.4-701.jar is in lib/app currently but is only used for testing purposes.

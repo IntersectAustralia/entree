@@ -1,0 +1,176 @@
+<project name="entree-ui" basedir="." >
+
+	<!-- import the shared targets -->
+	<import file="${basedir}/../intersect-common/common-build.xml" />
+	
+	<!-- import the special build file for creating the swt classpath according to os -->
+	<import file="${basedir}/build-os-classpath.xml" />
+
+	<!-- project directories -->
+	<property name="test.lib.dir" location="${basedir}/lib/test" />
+	<property name="app.lib.dir" location="${basedir}/lib/app" />
+	<property name="resources.dir" location="${basedir}/resources" />
+	<property name="config.dir" location="${basedir}/config" />
+
+	<!-- cobertura exclusions - we don't unit test the UI classes-->
+	<property name="project.specific.cobertura.excludes" value="**au/org/intersect/entree-ui/ui/*.class"/>
+
+	<!-- path definitions -->
+	<path id="base.classpath">
+		<fileset dir="${app.lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+		<!--instrumented classes go first so they are used if they exist-->
+		<pathelement location="${instrumented.classes.dir}" />
+		<pathelement location="${src.compile.dir}" />
+	</path>
+
+	<path id="test.classpath">
+		<path refid="base.classpath" />
+		<path refid="tools.classpath" />
+		<fileset dir="${test.lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+		<pathelement location="${test.compile.dir}" />
+		<pathelement location="${resources.dir}" />
+	</path>
+
+	<!--
+		Private targets - don't do dependency management here. Most stuff is
+		inherited from common-build.xml in intersect-common
+	-->
+
+	<target name="-get-entree-core">
+		<!-- build the entree-core jar and put it in the lib directory -->
+		<ant antfile="${basedir}/../entree-core/build.xml" target="jar" inheritall="false"/>
+		<copy file="${basedir}/../entree-core/build/ant/dist/entree-core.jar" todir="${app.lib.dir}"/>
+	</target>
+
+	<target name="-dist" >
+		<!-- copy base.classpath to dist/lib -->
+		<copy todir="${dist.work.dir}/lib" overwrite="true">
+			<path refid="base.classpath"/>
+		</copy>
+
+		<!-- jar the stuff up (excluding config), add dist/lib to its classpath -->
+		<copy todir="${dist.work.dir}" overwrite="true">
+			<fileset dir="${src.compile.dir}" />
+		</copy>
+		<copy todir="${dist.work.dir}" overwrite="true">
+			<fileset dir="${resources.dir}"/>
+		</copy>
+		
+		<!-- copy in the template properties file and mapper config -->
+		<copy todir="${dist.dir}/${target-os}" file="${config.dir}/template/entree-config.properties" overwrite="true"/>
+		<copy todir="${dist.dir}/${target-os}" file="${config.dir}/template/mapper-context.xml" overwrite="true"/>
+		
+		<!-- setup classpath -->
+		<path id="jarclasspath" >
+			<fileset dir="${dist.work.dir}">
+				<include name="**/*.jar"/>
+			</fileset>
+		</path>
+		<manifestclasspath property="jar.classpath" jarfile="${dist.work.dir}/Entree.jar" maxParentLevels="0">
+			<classpath refid="jarclasspath" />
+		</manifestclasspath>
+
+		<!-- copy libs to dist dir -->
+		<copy todir="${dist.dir}/${target-os}/lib" overwrite="true">
+			<fileset dir="${dist.work.dir}/lib"/>
+		</copy>
+
+		<!-- delete the libs so they don't get put into the jar -->
+		<delete includeemptydirs="true">
+			<fileset dir="${dist.work.dir}/lib">
+			</fileset>
+		</delete>
+
+		<!-- jar it up -->
+		<jar basedir="${dist.work.dir}" destfile="${dist.dir}/${target-os}/Entree.jar">
+			<manifest>
+				<attribute name="Main-Class" value="au.org.intersect.entreeui.controller.Bootstrapper" />
+				<attribute name="Class-Path" value="${jar.classpath} ." />
+			</manifest>
+		</jar>
+		
+		<!-- create a zip -->
+		<zip destfile="${dist.dir}/entree-${target-os}.zip" basedir="${dist.dir}/${target-os}" />
+	</target>
+	
+	<target name="-copy-institution-config" if="target-config">
+		<echo message="using properties file for ${target-config}"/>
+		<copy todir="${dist.dir}/${target-os}" file="${config.dir}/${target-config}/entree-config.properties" overwrite="true"/>
+		<copy todir="${dist.dir}/${target-os}" file="${config.dir}/${target-config}/mapper-context.xml" overwrite="true" failonerror="false"/>
+	</target>
+
+
+	<!-- Used to manually set the OS to build for. Overrides auto-detection so that we can build for multiple platforms -->
+	<target name="-set-win-32">
+		<property name="isWin32" value="true"/>
+		<property name="target-os" value="win-32"/>
+	</target>
+	<target name="-set-win-64">
+		<property name="isWin64" value="true"/>
+		<property name="target-os" value="win-64"/>
+	</target>
+	<target name="-set-mac-cocoa-64">
+		<property name="isMacCocoa64" value="true"/>
+		<property name="target-os" value="mac-cocoa-64"/>
+	</target>
+	<target name="-set-mac-cocoa-32">
+		<property name="isMacCocoa32" value="true"/>
+		<property name="target-os" value="mac-cocoa-32"/>
+	</target>
+	<target name="-set-mac-carbon-32">
+		<property name="isMacCarbon32" value="true"/>
+		<property name="target-os" value="mac-carbon-32"/>
+	</target>
+	<target name="-set-linux-32">
+		<property name="isLinux32" value="true"/>
+		<property name="target-os" value="linux-32"/>
+	</target>
+	<target name="-set-linux-64">
+		<property name="isLinux64" value="true"/>
+    	<property name="target-os" value="linux-64"/>
+	</target>
+
+	<!-- public targets - dependency management is done here -->
+	<target name="checkstyle" depends="-init, -checkstyle" description="Generate a report of coding standards violations" />
+	<target name="clean" depends="-clean" description="Delete build artifacts" />
+	<target name="compile" depends="-init, -detect-os, -augment-classpath, -get-entree-core, -compile" description="Compile" />
+	<target name="findbugs" depends="-init, compile, -findbugs" description="Generate a report of findbugs violations" />
+	<target name="test" depends="compile, -copy-test-resources, -test" description="Run junit tests" />
+	<target name="test-instrumented" depends="compile, -copy-test-resources, -instrument-classes, -test, -cobertura-report" description="Run unit tests on instrumented classes and generate coverage report" />
+
+	<target name="all" depends="clean, checkstyle, compile, test" description="Compile, checkstyle, run unit tests" />
+	<target name="hudson-all" depends="clean, checkstyle, compile, test-instrumented" description="Compile, checkstyle, run unit tests with coverage" />
+
+	<!-- distribution targets: default tries to detect os, others as specified -->
+	<target name="dist" depends="-init, -detect-os, -augment-classpath, compile, -dist, -copy-institution-config" description="Create artefacts for the current OS" />
+	
+	<target name="dist-win-32"        depends="-init, -set-win-32, -augment-classpath, compile, -dist, -copy-institution-config" description="Create artefacts for 32 bit windows" />
+	<target name="dist-win-64"        depends="-init, -set-win-64, -augment-classpath, compile, -dist, -copy-institution-config" description="Create artefacts for 64 bit windows" />
+	<target name="dist-mac-cocoa-64"  depends="-init, -set-mac-cocoa-64, -augment-classpath, compile, -dist, -copy-institution-config" description="Create artefacts for 64 bit mac (cocoa)" />
+	<target name="dist-mac-cocoa-32"  depends="-init, -set-mac-cocoa-32, -augment-classpath, compile, -dist, -copy-institution-config" description="Create artefacts for 32 bit mac (cocoa)" />
+	<target name="dist-mac-carbon-32" depends="-init, -set-mac-carbon-32, -augment-classpath, compile, -dist, -copy-institution-config" description="Create artefacts for 32 bit mac (carbon)" />
+	<target name="dist-linux-32"      depends="-init, -set-linux-32, -augment-classpath, compile, -dist, -copy-institution-config" description="Create artefacts for linux" />
+	<target name="dist-linux-64"      depends="-init, -set-linux-64, -augment-classpath, compile, -dist, -copy-institution-config" description="Create artefacts for 64 bit linux" />
+
+	<target name="build-release" description="build for all operating systems">
+		<delete dir="${dist.work.dir}" />
+        <antcall target="dist-win-32" inheritall="false"/>
+		<delete dir="${dist.work.dir}" />
+        <antcall target="dist-win-64" inheritall="false"/>
+		<delete dir="${dist.work.dir}" />
+        <antcall target="dist-mac-cocoa-32" inheritall="false"/>
+		<delete dir="${dist.work.dir}" />
+        <antcall target="dist-mac-cocoa-64" inheritall="false"/>
+		<delete dir="${dist.work.dir}" />
+        <antcall target="dist-mac-carbon-32" inheritall="false"/>
+		<delete dir="${dist.work.dir}" />
+        <antcall target="dist-linux-32" inheritall="false"/>
+		<delete dir="${dist.work.dir}" />
+        <antcall target="dist-linux-64" inheritall="false"/>
+	</target>
+
+</project>
