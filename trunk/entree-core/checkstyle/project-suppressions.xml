@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC
+    "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+    "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+
+<suppressions>
+    
+    <suppress checks="IllegalCatch" files="HttpPostFileSender"/>
+    <suppress checks="ReturnCount" files="UowMapper"/>
+    
+    <!-- Molodensky is included largely as-is from a 3rd-party source. -->
+    <suppress checks="ParameterNumber" files="Molodensky" />
+    <suppress checks="UnnecessaryParentheses" files="Molodensky" />
+    <suppress checks="MagicNumber" files="Molodensky" />
+    
+    <!-- Magic numbers used to instantiate a constant -->
+    <suppress checks="MagicNumber" files="ReferenceEllipsoid" />
+    
+    <!-- Magic number make more sense here as they don't have particular meaning -->
+    <suppress checks="MagicNumber" files="GeoAccuracyCalculator" />
+    <suppress checks="MagicNumber" files="GridToLatitudeLongitudeConverter" />
+    <suppress checks="MagicNumber" files="LocationFuzzer" />
+    
+    <!-- Multiple string literals kind of make sense here -->
+    <suppress checks="MultipleStringLiterals" files="LocationConverter"/>
+    
+    <!-- Need high return count -->
+    <suppress checks="ReturnCount" files="GeospatialDatum" />
+    
+    <!--   Suppressions for test code -->
+    <suppress checks="ImportControl" files="[/\\]test[/\\]"/>
+    <suppress checks="MagicNumber" files="[/\\]test[/\\]"/>
+    <suppress checks="MultipleStringLiterals" files="[/\\]test[/\\]"/>
+    
+    <!-- wanting to use the junit @Rule with TempoararyFolder requires a public variable -->
+    <suppress checks="VisibilityModifier" files="CsvWriterTest" />
+    
+    <!-- this is taken as-is from the AVH -->
+    <suppress files="RedfearnsFormula" checks="[a-zA-Z0-9]*"/>
+    
+<!--  <suppress checks="IllegalCatch" files="[/\\]test[/\\]"/>-->
+<!--  <suppress id="warningCyclomaticComplexity" files="[/\\]test[/\\]"/>-->
+<!--  <suppress checks="MethodLength" files="[/\\]test[/\\]"/>-->
+<!--  <suppress id="warningFileLength" files="[/\\]test[/\\]"/>-->
+<!--  <suppress checks="MethodName" files="[/\\]test[/\\]"/>-->
+<!--  <suppress checks="TypeName" files="[/\\]test[/\\]"/>-->
+<!--  <suppress checks="JavadocMethod" files="[/\\]test[/\\]"/>-->
+<!--  <suppress checks="JavadocStyle" files="[/\\]test[/\\]"/>-->
+<!--  <suppress checks="JavadocType" files="[/\\]test[/\\]"/>-->
+<!--  <suppress checks="JavadocVariable" files="[/\\]test[/\\]"/>-->
+<!--  <suppress checks="IllegalThrows" files="[/\\]test[/\\]"/>-->
+<!--  <suppress checks="IllegalInstantiation" files="[/\\]test[/\\]"/>-->
+<!--  <suppress checks="ParameterNumberCheck" files="[/\\]test[/\\]"/>-->
+<!--   End of test code suppressions -->
+
+</suppressions>

@@ -1,0 +1,21 @@
+This file is a list of dependencies for entree-core.
+
+***
+Spring libs
+***
+org.springframework.asm-3.0.3.RELEASE.jar
+...beans...
+...context...
+...core...
+...expression...
+...transaction...
+
+...jdbc... - for the DB work
+
+commons-logging is required by spring
+
+***
+commons-dbcp, commons-pool are used for the DataSource associated with spring jdbc
+
+***
+log4j is used for our own logging

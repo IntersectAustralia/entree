@@ -1,0 +1,61 @@
+<project name="entree-core" basedir="." >
+	
+	<!-- import the shared targets -->
+	<import file="${basedir}/../intersect-common/common-build.xml" />
+	
+	<!-- project directories -->
+	<property name="test.lib.dir" location="${basedir}/lib/test" />
+	<property name="app.lib.dir" location="${basedir}/lib/app" />
+	<property name="resources.dir" location="${basedir}/resources" />
+	
+	<!-- path definitions -->
+	<path id="base.classpath">
+		<fileset dir="${app.lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+		<pathelement location="${basedir}/../entree-core/src"/>
+		<!--instrumented classes go first so they are used if they exist-->
+		<pathelement location="${instrumented.classes.dir}" />
+		<pathelement location="${src.compile.dir}" />
+	</path>
+	
+	<path id="test.classpath">
+		<path refid="base.classpath" />
+		<path refid="tools.classpath" />
+		<fileset dir="${test.lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+		<pathelement location="${test.compile.dir}" />
+		<pathelement location="${resources.dir}" />
+	</path>
+	
+	<!--
+		Private targets - don't do dependency management here. Most stuff is
+		inherited from common-build.xml in intersect-common
+	-->
+    <!-- build jar -->
+    <target name="-jar">
+        <!-- copy necessary files -->
+        <copy todir="${dist.work.dir}" overwrite="true">
+            <fileset dir="${src.compile.dir}" />
+        </copy>
+        <!-- jar it up -->
+        <jar basedir="${dist.work.dir}" destfile="${dist.dir}/entree-core.jar">
+        </jar>
+    </target>
+	
+	<!-- public targets - dependency management is done here -->
+	<target name="checkstyle" depends="-init, -checkstyle" description="Generate a report of coding standards violations" />
+	<target name="clean" depends="-clean" description="Delete build artifacts" />
+	<target name="compile" depends="-init, -compile" description="Compile" />
+	<target name="findbugs" depends="-init, -compile, -findbugs" description="Generate a report of findbugs violations" />
+    
+    <target name="jar" depends="compile, -jar" description="jar"/>
+	<target name="test" depends="compile, -copy-test-resources, -test" description="Run junit tests" />
+	<target name="test-instrumented" depends="compile, -copy-test-resources, -instrument-classes, -test, -cobertura-report" description="Run unit tests on instrumented classes and generate coverage report" />
+	
+	<target name="all" depends="clean, checkstyle, compile, test" description="Compile, checkstyle, run unit tests" />
+	<target name="hudson-all" depends="clean, checkstyle, compile, test-instrumented" description="Compile, checkstyle, run unit tests with coverage" />
+
+
+</project>
